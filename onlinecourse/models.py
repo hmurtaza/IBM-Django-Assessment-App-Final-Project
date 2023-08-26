@@ -132,11 +132,14 @@ class Choice(models.Model):
     question_id = models.ForeignKey(to=Question, on_delete=models.CASCADE)
     is_correct = models.BooleanField()
 
+    def __str__(self):
+        return self.choice_text
+
 # <HINT> The submission model
 # One enrollment could have multiple submission
 # One submission could have multiple choices
 # One choice could belong to multiple submissions
 class Submission(models.Model):
    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-   chocies = models.ManyToManyField(Choice)
+   choices = models.ManyToManyField(Choice)
 #    Other fields and methods you would like to design

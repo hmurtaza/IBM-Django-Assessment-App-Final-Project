@@ -116,16 +116,19 @@ def extract_answers(request):
          # Add each selected choice object to the submission object
          # Redirect to show_exam_result with the submission id
 def submit(request, course_id):
-    username = request.POST['username']
-    course = Course.objects.get(pk=course_id)
-    user = User.objects.get(username=username)
-    # print(user)
-    enrollment = Enrollment.objects.get(username=user,course_id=course_id)
+    username = request.user.username #POST['user']
+    print(course_id)
     
+    user = User.objects.get(username=username)
+    course = Course.objects.get(pk=course_id)
+    # print(user)
+    enrollment = Enrollment.objects.get(user_id=user.id,course_id=course_id)
+    submission_ins = Submission(enrollment_id=enrollment.id)
+    submission_ins.save()
     for sel_choice in extract_answers(request):
-        a = Submission.objects.create(enrollment_id=enrollment.id, choice=sel_choice)
-        a.save() 
-    return redirect(reverse('onlinecourse:show_exam_result', args=(submission.id,)))
+        submission_ins.choices.add(sel_choice)
+        submission_ins.save()  
+    return redirect(reverse('onlinecourse:show_exam_result', args=(course.id,submission_ins.id,)))
 # <HINT> A example method to collect the selected choices from the exam form from the request object
 
 
@@ -140,13 +143,16 @@ def submit(request, course_id):
 def show_exam_result(request, course_id, submission_id):
     course = Course.objects.get(pk=course_id)
     submission = Submission.objects.get(pk=submission_id)
-    context={}
+    questions = Question.objects.filter(lesson_id=course.id)
+    selected_ids = submission.choices.all()
     score=0
-    for choice in submission.choices.all():
-        if choice.is_true:
-            score+=1
+    total=0
+    for question in questions:
+        if question.is_get_score(selected_ids):
+                score = score + question.grade
+        total = total + question.grade
         
     context = {'course':course,
-    'selected_ids':submission.choice_id,
-    'grade':score}
-    return render(request, 'onlinecourse/exam_result_bootstrap')
+    'selected_ids':selected_ids,
+    'grade':(score/total * 100)}
+    return render(request, 'onlinecourse/exam_result_bootstrap.html',context=context)
