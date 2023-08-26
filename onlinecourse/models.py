@@ -102,7 +102,7 @@ class Enrollment(models.Model):
     # Has question content
     # Other fields and methods you would like to design
 class Question(models.Model):
-    lesson_id =  models.ForeignKey(to=Lesson, on_delete=models.CASCADE)
+    lesson_id =  models.ForeignKey(to=Course, on_delete=models.CASCADE)
     question_text = models.TextField(verbose_name='Question Text', max_length=300)
     grade = models.IntegerField()
     # Foreign key to lesson
@@ -117,6 +117,8 @@ class Question(models.Model):
            return True
        else:
            return False
+    def __str__(self):
+        return self.question_text
 
 
 #  <HINT> Create a Choice Model with:
