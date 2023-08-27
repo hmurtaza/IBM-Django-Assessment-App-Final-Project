@@ -57,9 +57,13 @@
                             <div class="card-header"><h5>{{ question.question_text}}</h5></div>
                             <div class="form-group">
                                 {% for choice in question.choice_set.all %}
-                                    {% if choice.is_correct %}
+                                    {% if choice.is_correct and choice in selected_ids %}
                                         <div class="text-success">
                                             Correct answer: {{ choice.choice_text }}
+                                        </div>
+                                    {% elif choice.is_correct and not choice in selected_ids %}
+                                        <div class="text-warning">
+                                            Not Selected: {{ choice.choice_text }}
                                         </div>
                                     {% else %}
                                         <div class="">

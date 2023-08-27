@@ -148,7 +148,7 @@ def show_exam_result(request, course_id, submission_id):
     score=0
     total=0
     for question in questions:
-        if question.is_get_score(selected_ids):
+        if question.is_get_score(selected_ids.filter(question_id=question.id)):
                 score = score + question.grade
         total = total + question.grade
         
